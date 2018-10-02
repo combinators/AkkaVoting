@@ -7,17 +7,13 @@ import edu.wpi.voting.messages.*;
 
 import java.util.*;
 
-public class VotingBooth extends AbstractActor {
+public class VotingStation extends AbstractActor {
     private final ActorRef manager;
     private final Set<String> ballotPasswords;
     private final Map<String, Integer> votesCast;
     private int abstained;
 
-    static Props props(ActorRef manager) {
-        return Props.create(VotingBooth.class, () -> new VotingBooth(manager));
-    }
-
-    public VotingBooth(ActorRef manager) {
+    public VotingStation(ActorRef manager) {
         this.ballotPasswords = new HashSet<String>();
         this.votesCast = new HashMap<String, Integer>();
         this.abstained = 0;
@@ -26,7 +22,7 @@ public class VotingBooth extends AbstractActor {
 
     public Receive createReceive() {
         return receiveBuilder()
-                .match(OpenBooth.class, ob -> {
+                .match(OpenStation.class, ob -> {
                     ballotPasswords.clear();
                     votesCast.clear();
                     abstained = 0;
@@ -63,4 +59,8 @@ public class VotingBooth extends AbstractActor {
                 }).build();
     }
 
+
+    public static Props props(ActorRef manager) {
+        return Props.create(VotingStation.class, () -> new VotingStation(manager));
+    }
 }

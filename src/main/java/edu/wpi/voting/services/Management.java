@@ -2,11 +2,12 @@ package edu.wpi.voting.services;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import edu.wpi.voting.messages.Ballot;
 import edu.wpi.voting.messages.ElectionResults;
-import edu.wpi.voting.messages.OpenBooth;
+import edu.wpi.voting.messages.OpenStation;
 import edu.wpi.voting.messages.StartElection;
 
 import java.util.ArrayList;
@@ -31,10 +32,10 @@ public class Management extends AbstractActor {
         return receiveBuilder()
                 .match(StartElection.class, s -> {
                     log.info("Election started");
-                    ActorRef votingBooth = getContext().actorOf(VotingBooth.props(getSelf()));
+                    ActorRef votingStation = getContext().actorOf(VotingStation.props(getSelf()));
                     votersWithoutBallots.clear();
                     votersWithoutBallots.addAll(voters);
-                    votingBooth.tell(new OpenBooth(parties, voters.size()), getSelf());
+                    votingStation.tell(new OpenStation(parties, voters.size()), getSelf());
                 })
                 .match(Ballot.class, ballot -> {
                     if (votersWithoutBallots.size() > 0) {
@@ -48,5 +49,9 @@ public class Management extends AbstractActor {
                     log.info("abstained {}", results.abstained);
                     getContext().stop(self());
                 }).build();
+    }
+
+    public static Props props(List<String> parties, List<ActorRef> voters) {
+        return Props.create(Management.class, () -> new Management(parties, voters));
     }
 }

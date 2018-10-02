@@ -1,6 +1,8 @@
 package edu.wpi.voting.services;
 
 import akka.actor.AbstractActor;
+import akka.actor.ActorRef;
+import akka.actor.Props;
 import edu.wpi.voting.messages.Ballot;
 import edu.wpi.voting.messages.ParticipationReceipt;
 import edu.wpi.voting.messages.Vote;
@@ -20,4 +22,6 @@ public class Voter extends AbstractActor {
             getContext().stop(getSelf());
         }).build();
     }
+
+    public static Props props(String voteFor) { return Props.create(Voter.class, () -> new Voter(voteFor)); }
 }
